@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Threat Reputation Checker</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='style.css') }}"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div class="container">
+      <h1>Threat Reputation Checker</h1>
+      <p class="sub-heading">
+        IP and Domain based threat reputations compiled from various sources,
+        all in one place.
+      </p>
+      <form method="post" class="form-container">
+        <div class="input-group">
+          <input
+            type="text"
+            name="ip_or_domain"
+            placeholder="Enter IP or Domain"
+            required
+          />
+          <div class="toggle-group">
+            <label>
+              <input type="radio" name="report_type" value="ip" checked /> IP
+            </label>
+            <label>
+              <input type="radio" name="report_type" value="domain" /> Domain
+            </label>
+          </div>
+        </div>
+        <button type="submit">Check Reputation</button>
+      </form>
+
+      {% if error %}
+      <p class="error">{{ error }}</p>
+      {% endif %} {% if virustotal_report %}
+      <div class="result-container">
+        <div class="result-box">
+          <h2>VirusTotal Report</h2>
+          {% if virustotal_report.error %}
+          <p class="error">{{ virustotal_report.error }}</p>
+          {% else %}
+          <p><strong>IP/Domain:</strong> {{ virustotal_report.data.id }}</p>
+          <p>
+            <strong>Reputation Score:</strong> {{
+            virustotal_report.data.attributes.last_analysis_stats.malicious }}
+            Malicious
+          </p>
+          <p>
+            <strong>Total Analyzers:</strong> {{
+            virustotal_report.data.attributes.last_analysis_stats.total }}
+          </p>
+          {% endif %}
+        </div>
+        {% if abuseipdb_report %}
+        <div class="result-box">
+          <h2>AbuseIPDB Report</h2>
+          {% if abuseipdb_report.error %}
+          <p class="error">{{ abuseipdb_report.error }}</p>
+          {% else %}
+          <p><strong>IP:</strong> {{ abuseipdb_report.data.ipAddress }}</p>
+          <p>
+            <strong>Abuse Confidence Score:</strong> {{
+            abuseipdb_report.data.abuseConfidenceScore }}
+          </p>
+          <p>
+            <strong>Reported Count:</strong> {{
+            abuseipdb_report.data.reportedCount }}
+          </p>
+          {% endif %}
+        </div>
+        {% endif %}
+      </div>
+      {% endif %}
+    </div>
+  </body>
+</html>
