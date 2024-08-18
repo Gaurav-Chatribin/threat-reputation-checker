@@ -2,7 +2,7 @@
 
 This Flask application is designed to provide users with a convenient way to assess the reputation of an IP address or domain name through the integration of VirusTotal, AbuseIPDB, and Whoislookup APIs. By offering a user-friendly interface, the application allows users to input a single IP or domain and receive comprehensive results on a single page. This streamlined process of gathering threat-related information saves valuable time, particularly during urgent and time-critical investigations.
 
-![image](https://github.com/user-attachments/assets/63e21b74-ab58-4453-a72e-2a1eee3121d1)
+![image](https://github.com/user-attachments/assets/a47d208f-e962-4a90-8cb4-2dfc412b626c)
 
 ## Features
 
