@@ -1,7 +1,7 @@
 from flask import Flask, request, render_template
 import re
 from module.virustotal import get_virustotal_report
-from module.abuseipdb import get_abuseipdb_report
+from module.abuseipdb import get_abuseipdb_report  # Corrected import
 from module.whois_lookup import get_whois_report
 
 app = Flask(__name__)
