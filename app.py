@@ -1,8 +1,8 @@
 from flask import Flask, request, render_template
 import re
 from module.virustotal import get_virustotal_report
-from module.abuseipdb import get_abuseipdb_report  # Corrected import
-from module.whois_lookup import get_whois_report
+from module.abuseipdb import get_abuseipdb_report
+from module.whoislookup import get_whois_report  # Import the WHOIS lookup module
 
 app = Flask(__name__)
 
@@ -44,6 +44,7 @@ def index():
             virustotal_report = get_virustotal_report(ip_or_domain, report_type)
             abuseipdb_report = None
             whois_report = get_whois_report(ip_or_domain)
+
         
         else:
             return render_template('index.html', error="Invalid report type selected.")
