@@ -40,7 +40,7 @@ This Flask application allows users to check the reputation of IP addresses and 
 
 4. **Set up your API keys:**
 
-    Replace the API_KEY in config.py file in the root directory with the following content:
+    Create a file in the root directory. Name it "config.py" and paste the API_KEY file as per the format mentioned below:
 
     ```python
     VIRUSTOTAL_API_KEY = 'your_virustotal_api_key'
