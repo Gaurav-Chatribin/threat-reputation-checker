@@ -4,18 +4,12 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Threat Reputation Checker</title>
-
-    <!-- Link to external CSS file -->
     <link
       rel="stylesheet"
       href="{{ url_for('static', filename='style.css') }}"
     />
-
-    <!-- Preconnect to Google Fonts for better performance -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-
-    <!-- Link to Google Fonts -->
     <link
       href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap"
       rel="stylesheet"
@@ -23,75 +17,55 @@
   </head>
   <body>
     <div class="container">
-      <!-- Main Heading of the Page -->
       <h1>Threat Reputation Checker</h1>
-
-      <!-- Subheading/description of the tool -->
       <p class="sub-heading">
         IP and Domain based threat reputations compiled from various sources,
         all in one place.
       </p>
-
-      <!-- Form for IP/Domain input and selection of report type -->
       <form method="post" class="form-container">
         <div class="input-group">
-          <!-- Input field for IP or Domain -->
           <input
             type="text"
             name="ip_or_domain"
             placeholder="Enter IP or Domain"
             required
           />
-
-          <!-- Radio buttons to choose between IP or Domain report -->
           <div class="toggle-group">
-            <label>
-              <input type="radio" name="report_type" value="ip" checked /> IP
-            </label>
-            <label>
-              <input type="radio" name="report_type" value="domain" /> Domain
-            </label>
+            <label
+              ><input type="radio" name="report_type" value="ip" checked />
+              IP</label
+            >
+            <label
+              ><input type="radio" name="report_type" value="domain" />
+              Domain</label
+            >
           </div>
         </div>
-
-        <!-- Submit button for the form -->
         <button type="submit">Check Reputation</button>
       </form>
-
-      <!-- Error message block, displayed if there's an error -->
       {% if error %}
       <p class="error">{{ error }}</p>
-      {% endif %}
-
-      <!-- VirusTotal report block, displayed if a report is available -->
-      {% if virustotal_report %}
+      {% endif %} {% if virustotal_report or abuseipdb_report or whois_report or
+      criminal_ip_report %}
       <div class="result-container">
+        {% if virustotal_report %}
         <div class="result-box">
           <h2>VirusTotal Report</h2>
           {% if virustotal_report.error %}
           <p class="error">{{ virustotal_report.error }}</p>
           {% else %}
-          <!-- Display the IP/Domain ID -->
           <p><strong>IP/Domain:</strong> {{ virustotal_report.data.id }}</p>
-
-          <!-- Calculate total analyzers and display reputation score -->
           {% set total_analyzers =
           virustotal_report.data.attributes.last_analysis_stats.malicious +
           virustotal_report.data.attributes.last_analysis_stats.suspicious +
           virustotal_report.data.attributes.last_analysis_stats.undetected +
           virustotal_report.data.attributes.last_analysis_stats.harmless %}
-
           <p>
-            <strong>Reputation Score:</strong>
-            {{ virustotal_report.data.attributes.last_analysis_stats.malicious
+            <strong>Reputation Score:</strong> {{
+            virustotal_report.data.attributes.last_analysis_stats.malicious
             }}/{{ total_analyzers }} Malicious
           </p>
-          <p>
-            <strong>Total Analyzers:</strong>
-            {{ total_analyzers }}
-          </p>
-
-          <!-- Display tags associated with the IP/Domain if available -->
+          <p><strong>Total Analyzers:</strong> {{ total_analyzers }}</p>
           {% if virustotal_report.data.attributes.tags %}
           <p>
             <strong>Tags:</strong> {{ virustotal_report.data.attributes.tags |
@@ -99,8 +73,6 @@
           </p>
           {% endif %}
           <br />
-
-          <!-- Display detailed analysis breakdown -->
           <h3>Analysis Details</h3>
           <ul>
             <li>
@@ -124,60 +96,44 @@
           </ul>
           {% endif %}
         </div>
-
-        <!-- AbuseIPDB report block, displayed if a report is available -->
-        {% if abuseipdb_report %}
+        {% endif %} {% if abuseipdb_report %}
         <div class="result-box">
           <h2>AbuseIPDB Report</h2>
           {% if abuseipdb_report.error %}
           <p class="error">{{ abuseipdb_report.error }}</p>
           {% else %}
-          <!-- Display the IP address -->
           <p><strong>IP:</strong> {{ abuseipdb_report.ipAddress }}</p>
-
-          <!-- Display the Abuse Confidence Score -->
           <p>
             <strong>Abuse Confidence Score:</strong> {{
             abuseipdb_report.abuseConfidenceScore }}
           </p>
-
-          <!-- Display the Total Reports Count -->
           <p>
             <strong>Total Reports:</strong> {{ abuseipdb_report.totalReports }}
           </p>
-
-          <!-- Display the Last Reported Date -->
           <p>
             <strong>Last Reported:</strong> {{ abuseipdb_report.lastReportedAt
             }}
           </p>
-
-          <!-- Display the ISP -->
           <p><strong>ISP:</strong> {{ abuseipdb_report.isp }}</p>
-
-          <!-- Display the Country -->
           <p><strong>Country:</strong> {{ abuseipdb_report.countryCode }}</p>
-
-          <!-- Display additional information if available -->
           {% if abuseipdb_report.hostnames %}
           <p>
             <strong>Hostnames:</strong> {{ abuseipdb_report.hostnames | join(',
             ') }}
           </p>
-          {% endif %} {% if abuseipdb_report.domain %}
-          <p><strong>Domain:</strong> {{ abuseipdb_report.domain }}</p>
+          {% endif %} {% if abuseipdb_report.domains %}
+          <p>
+            <strong>Domains:</strong> {{ abuseipdb_report.domains | join(', ')
+            }}
+          </p>
           {% endif %} {% endif %}
         </div>
-        {% endif %}
-
-        <!-- WHOIS report block, displayed if available -->
-        {% if whois_report %}
+        {% endif %} {% if whois_report %}
         <div class="result-box">
           <h2>WHOIS Information</h2>
           {% if whois_report.error %}
           <p class="error">{{ whois_report.error }}</p>
           {% else %}
-          <!-- Display WHOIS details -->
           <p><strong>Domain Name:</strong> {{ whois_report.domain_name }}</p>
           <p>
             <strong>Registrant Organization:</strong> {{
@@ -193,6 +149,31 @@
           </p>
           <p>
             <strong>Admin Country:</strong> {{ whois_report.admin_country }}
+          </p>
+          {% endif %}
+        </div>
+        {% endif %} {% if criminal_ip_report %}
+        <div class="result-box">
+          <h2>Criminal IP Report</h2>
+          {% if criminal_ip_report.error %}
+          <p class="error">{{ criminal_ip_report.error }}</p>
+          {% else %}
+          <p>
+            <strong>Inbound Score:</strong> {{ criminal_ip_report.inbound_score
+            }}
+          </p>
+          <p>
+            <strong>Outbound Score:</strong> {{
+            criminal_ip_report.outbound_score }}
+          </p>
+          <p>
+            <strong>Is Malicious:</strong> {{ criminal_ip_report.is_malicious }}
+          </p>
+          <p>
+            <strong>Tags:</strong> {{ criminal_ip_report.tags | join(', ') }}
+          </p>
+          <p>
+            <strong>Abuse Record:</strong> {{ criminal_ip_report.abuse_record }}
           </p>
           {% endif %}
         </div>

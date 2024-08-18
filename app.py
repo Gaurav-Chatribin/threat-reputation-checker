@@ -2,7 +2,9 @@ from flask import Flask, request, render_template
 import re
 from module.virustotal import get_virustotal_report
 from module.abuseipdb import get_abuseipdb_report
-from module.whoislookup import get_whois_report  # Import the WHOIS lookup module
+from module.whoislookup import get_whois_report
+from module.criminal_ip import check_ip_reputation  # Import the Criminal IP module
+from config import CRIMINAL_IP_API_KEY  # Assuming API keys are stored in config.py
 
 app = Flask(__name__)
 
@@ -20,6 +22,7 @@ def index():
     virustotal_report = None
     abuseipdb_report = None
     whois_report = None
+    criminal_ip_report = None
 
     if request.method == 'POST':
         ip_or_domain = request.form.get('ip_or_domain')
@@ -35,6 +38,7 @@ def index():
                 return render_template('index.html', error="Invalid IP address. Please enter a valid IP (e.g., 192.168.1.1).")
             virustotal_report = get_virustotal_report(ip_or_domain, report_type)
             abuseipdb_report = get_abuseipdb_report(ip_or_domain)
+            criminal_ip_report = check_ip_reputation(ip_or_domain, CRIMINAL_IP_API_KEY)
         
         elif report_type == 'domain':
             if not is_domain(ip_or_domain):
@@ -42,14 +46,13 @@ def index():
                     return render_template('index.html', error="You have selected the domain type, but entered an IP address. Please enter a valid domain name (e.g., example.com).")
                 return render_template('index.html', error="Invalid domain name. Please enter a valid domain (e.g., example.com).")
             virustotal_report = get_virustotal_report(ip_or_domain, report_type)
-            abuseipdb_report = None
             whois_report = get_whois_report(ip_or_domain)
-
+            criminal_ip_report = None
         
         else:
             return render_template('index.html', error="Invalid report type selected.")
         
-        return render_template('index.html', virustotal_report=virustotal_report, abuseipdb_report=abuseipdb_report, whois_report=whois_report)
+        return render_template('index.html', virustotal_report=virustotal_report, abuseipdb_report=abuseipdb_report, whois_report=whois_report, criminal_ip_report=criminal_ip_report)
     
     return render_template('index.html')
 
